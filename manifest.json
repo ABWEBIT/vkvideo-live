@@ -1,12 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "VKPL помощник",
-  "description": "Полезные сервисы для live.vkplay.ru",
-  "version": "1.5.5",
-  "permissions": ["webNavigation","activeTab","tabs","scripting","storage"],
-  "action": {
-    "default_popup": "settings.html"
-  },
+  "name": "VK Video Live помощник",
+  "description": "Полезные изменения на live.vkvideo.ru",
+  "version": "1.6.5",
+  "permissions": ["webNavigation","tabs","scripting","storage"],
+  "action": {"default_popup": "settings.html"},
   "background": {"service_worker": "service_worker.js"},
-  "host_permissions": ["*://live.vkplay.ru/*"]
+  "host_permissions": ["*://live.vkvideo.ru/*"]
 }
