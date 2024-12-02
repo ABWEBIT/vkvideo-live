@@ -1,28 +1,32 @@
 <!DOCTYPE html>
 <html lang="ru">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
-    <link rel="stylesheet" href="settings.css">
-    <title>Document</title>
-  </head>
-  <body>
-    <div id="points" class="button" data-state="">
-      <div class="status"></div>
-      <div class="text">Сбор баллов канала</div>
-    </div>
-    <div id="hearts" class="button" data-state="">
-      <div class="status"></div>
-      <div class="text">Прожатие сердечка</div>
-    </div>
-    <div id="recomm" class="button" data-state="">
-      <div class="status"></div>
-      <div class="text">Скрыть реком. и портал</div>
-    </div>
-    <div class="help">Применение настроек требует перезагрузку страницы.</div>
-    <div id="reload" class="button">
-      <div class="text">Перезагрузить</div>
-    </div>
-    <script src="settings.js"></script>
-  </body>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<link rel="stylesheet" href="style.css">
+<title>Document</title>
+</head>
+<body>
+
+<div class="button" data-vklive="points" data-state="">
+  Сбор баллов канала
+</div>
+<div class="button" data-vklive="hearts" data-state="">
+  Прожатие сердечка
+</div>
+<div class="button" data-vklive="recommendations" data-state="">
+  Скрыть рекомендации
+</div>
+<div class="button" data-vklive="portal" data-state="">
+  Скрыть кнопку портала
+</div>
+<div class="button" data-vklive="unfixed" data-state="">
+  Нефиксированная ширина
+</div>
+
+<div class="help">Применение настроек требует перезагрузку страницы.</div>
+<div class="button" id="reload">Перезагрузить</div>
+
+<script src="settings.js"></script>
+</body>
 </html>
