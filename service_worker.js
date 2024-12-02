@@ -1,98 +1,113 @@
-const filter = {url: [{hostContains: '.vkplay.ru'}]};
-const vkPlayLiveSite = new RegExp(/^(https:\/\/)live.vkplay.ru*/);
-const vkPlayLiveStream = new RegExp(/^(https:\/\/)live.vkplay.ru\/([-a-zA-Z0-9%_&.]+)$/);
-const transition = ['reload','generated','start_page'];
 
-chrome.storage.sync.get(['pointsKey']).then((r)=>{
-  if(r.pointsKey == null || chrome.runtime.lastError) chrome.storage.sync.set({pointsKey:'on'});
-});
+const vkliveSite = new RegExp(/^(https:\/\/)live\.vkvideo\.ru/);
+const vkliveStream = new RegExp(/^(https:\/\/)live\.vkvideo\.ru\/([-a-zA-Z0-9%_&.]*?)$/);
 
-chrome.storage.sync.get(['heartsKey']).then((r)=>{
-  if(r.heartsKey == null || chrome.runtime.lastError) chrome.storage.sync.set({heartsKey:'on'});
-});
+const vkliveKeys = [
+  { key: 'vklivePointsKey', value: 'on' },
+  { key: 'vkliveHeartsKey', value: 'on' },
+  { key: 'vkliveRecommendationsKey', value: 'off' },
+  { key: 'vklivePortalKey', value: 'off' },
+  { key: 'vkliveUnfixedKey', value: 'off' }
+];
 
-chrome.storage.sync.get(['recommKey']).then((r)=>{
-  if(r.recommKey == null || chrome.runtime.lastError) chrome.storage.sync.set({recommKey:'off'});
-});
+Promise.all(vkliveKeys.map(({key,value}) =>
+  chrome.storage.local.get([key]).then((r) => {
+    if(r[key] == null) chrome.storage.local.set({[key]:value});
+  })
+));
 
-function vkplayFunc(data){
-
-  if(vkPlayLiveSite.test(data.url) === true){
+function vkliveFunc(dUrl,dTab){
+  if(vkliveSite.test(dUrl) === true){
     chrome.scripting.executeScript({
-      target: {tabId: data.tabId},
-      func: vkPlayLiveSiteHelper
+      target: {tabId: dTab},
+      func: vkliveSiteHelper
     });
   };
 
-  if(vkPlayLiveStream.test(data.url) === true){
+  if(vkliveStream.test(dUrl) === true){
     chrome.scripting.executeScript({
-      target: {tabId: data.tabId},
-      func: vkPlayLiveStreamHelper
+      target: {tabId: dTab},
+      func: vkliveStreamHelper
     });
   };
 };
 
+const filter = {url: [{hostContains: 'live.vkvideo.ru'}]};
+const transition = ['typed','link','reload','generated','start_page','other'];
+
 chrome.webNavigation.onHistoryStateUpdated.addListener(details=>{
-  vkplayFunc(details);
+  vkliveFunc(details.url,details.tabId);
 },filter);
 
 chrome.webNavigation.onCommitted.addListener(details=>{
-  if(transition.includes(details.transitionType)) vkplayFunc(details);
+  if(transition.includes(details.transitionType)){
+    vkliveFunc(details.url,details.tabId);
+  };
 },filter);
 
-function vkPlayLiveSiteHelper(){
-  // рекомендации
+function vkliveSiteHelper(){
+
+  chrome.storage.local.get(['vkliveUnfixedKey']).then((r)=>{
+    if(r.vkliveUnfixedKey === 'on'){
+      let appWidth = document.querySelector('[class*="App_appChannelPage"]');
+      if(appWidth) appWidth.style.setProperty('min-width','100%','important');
+    };
+  });
+
   let channelsRoot = document.querySelector('[class*="Channels_root"]');
   if(channelsRoot){
+
     let channelsPanel=()=>{
-      chrome.storage.sync.get(['recommKey']).then((r)=>{
-        if(r.recommKey === 'on' && !chrome.runtime.lastError){
-          let channelsTitle = channelsRoot.querySelectorAll('[class*="Channels_title"]')[1];
-          if(channelsTitle) channelsTitle.style.display = "none";
-          let channelsList = channelsRoot.querySelectorAll('[class*="ChannelsList_container"]')[1];
-          if(channelsList) channelsList.style.display = "none";
-          let channelsPortal = channelsRoot.querySelector('[class*="Channels_portalBtn"]');
-          if(channelsPortal) channelsPortal.style.display = "none";
-          let channelsIconRecommended = channelsRoot.querySelector('[class*="Channels_iconRecommended"]');
-          if(channelsIconRecommended) channelsIconRecommended.style.height = "0px";
+
+      // рекомендации
+      chrome.storage.local.get(['vkliveRecommendationsKey']).then((r)=>{
+        if(r.vkliveRecommendationsKey === 'on'){
+          let channelsRecommendations = channelsRoot.querySelector('[class*="ChannelsRecommendations_root"]');
+          if(channelsRecommendations) channelsRecommendations.style.display = "none";
+          let channelsDelimiter = channelsRoot.querySelector('[class*="Channels_delimiter"]');
+          if(channelsDelimiter) channelsDelimiter.style.display = "none";
+        };
+      });
+
+      // кнопка портала
+      chrome.storage.local.get(['vklivePortalKey']).then((r)=>{
+        if(r.vklivePortalKey === 'on'){
+          let channelsPortalButton = channelsRoot.querySelector('[class*="ChannelsPortalButton_root"]');
+          if(channelsPortalButton) channelsPortalButton.style.display = "none";
         };
       });
     };
     channelsPanel();
 
-    let observerChannels = new MutationObserver(channelsObserverFunc);
-    function channelsObserverFunc(mutations){
-      for(let mutation of mutations){
+    let observerChannels = new MutationObserver((m) => {
+      m.forEach((mutation) => {
         if(mutation.type === 'childList') channelsPanel();
-      }
-    };
+      });
+    });
     observerChannels.observe(channelsRoot,{subtree:true,childList:true});
   };
 };
 
-function vkPlayLiveStreamHelper(){
-
+function vkliveStreamHelper(){
   // баллы
   let pointsInterval = setInterval(()=>{
     let pointsButton = document.querySelector('[class*="PointActions_root"]');
     if(pointsButton){
       if(pointsInterval) clearInterval(pointsInterval);
 
-      chrome.storage.sync.get(['pointsKey']).then((r)=>{
-        if(r.pointsKey === 'on' && !chrome.runtime.lastError){
-
+      chrome.storage.local.get(['vklivePointsKey']).then((r)=>{
+        if(r.vklivePointsKey === 'on'){
           let pointsCollecting=()=>{
-            let pointsButton = document.querySelector('[class*="PointActions_buttonBonus"]');
-            if(pointsButton) pointsButton.click();
+            let bonus = document.querySelector('[class*="PointActions_buttonBonus"]');
+            if(bonus)bonus.click();
           };
           pointsCollecting();
 
-          let observerPoints = new MutationObserver(pointsObserverFunc);
-          function pointsObserverFunc(mutations){
-            for(let mutation of mutations){
+          let observerPoints = new MutationObserver((m) => {
+            m.forEach((mutation) => {
               if(mutation.type === 'childList') pointsCollecting();
-            }
-          };
+            });
+          });
           observerPoints.observe(pointsButton,{subtree:true,childList:true});
 
         };
@@ -106,8 +121,8 @@ function vkPlayLiveStreamHelper(){
     let heartsButton = document.querySelector('[class*="LikeButton_container"]');
     if(heartsButton){
       if(heartsInterval) clearInterval(heartsInterval)
-      chrome.storage.sync.get(['heartsKey']).then((r)=>{
-        if(r.heartsKey === 'on' && !chrome.runtime.lastError){
+      chrome.storage.local.get(['vkliveHeartsKey']).then((r)=>{
+        if(r.vkliveHeartsKey === 'on'){
           let heartStatus = heartsButton.querySelector('[class*="LikeButton_iconLiked"]');
           if(heartStatus == null) heartsButton.click();
         };
