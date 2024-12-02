@@ -58,7 +58,6 @@ function vkliveSiteHelper(){
   if(channelsRoot){
 
     let channelsPanel=()=>{
-
       // рекомендации
       chrome.storage.local.get(['vkliveRecommendationsKey']).then((r)=>{
         if(r.vkliveRecommendationsKey === 'on'){
