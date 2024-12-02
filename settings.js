@@ -1,58 +1,56 @@
 'use strict';
-let
-pointsEl = document.getElementById('points'),
-heartsEl = document.getElementById('hearts'),
-recommEl = document.getElementById('recomm'),
-buttons = document.querySelectorAll('.button');
+let vkliveButtons = document.querySelectorAll('.button[data-vklive]');
 
-chrome.storage.sync.get(['pointsKey']).then((r)=>pointsEl.setAttribute('data-state',r.pointsKey));
-chrome.storage.sync.get(['heartsKey']).then((r)=>heartsEl.setAttribute('data-state',r.heartsKey));
-chrome.storage.sync.get(['recommKey']).then((r)=>recommEl.setAttribute('data-state',r.recommKey));
+let vklivePoints = document.querySelector('[data-vklive="points"]');
+let vkliveHearts = document.querySelector('[data-vklive="hearts"]');
+let vkliveRecommendations = document.querySelector('[data-vklive="recommendations"]');
+let vklivePortal = document.querySelector('[data-vklive="portal"]');
+let vkliveUnfixed = document.querySelector('[data-vklive="unfixed"]');
 
-buttons.forEach(function(button){
+chrome.storage.local.get([
+  'vklivePointsKey',
+  'vkliveHeartsKey',
+  'vkliveRecommendationsKey',
+  'vklivePortalKey',
+  'vkliveUnfixedKey'
+]).then((r) => {
+  vklivePoints.setAttribute('data-state', r.vklivePointsKey);
+  vkliveHearts.setAttribute('data-state', r.vkliveHeartsKey);
+  vkliveRecommendations.setAttribute('data-state', r.vkliveRecommendationsKey);
+  vklivePortal.setAttribute('data-state', r.vklivePortalKey);
+  vkliveUnfixed.setAttribute('data-state', r.vkliveUnfixedKey);
+});
+
+vkliveButtons.forEach(function(button){
   button.addEventListener('click',()=>{
 
-    switch (button.getAttribute('id')){
-      case 'points':
-      chrome.storage.sync.get(['pointsKey']).then((r)=>{
-        if(r.pointsKey === 'on'){
-          chrome.storage.sync.set({pointsKey:'off'});
-          pointsEl.setAttribute('data-state','off');
-        }
-        else if(r.pointsKey === 'off'){
-          chrome.storage.sync.set({pointsKey:'on'});
-          pointsEl.setAttribute('data-state','on');
-        }
+    let toggleSetting = (key,element) => {
+      chrome.storage.local.get([key]).then((r) => {
+        let newState = r[key] === 'on' ? 'off' : 'on';
+        chrome.storage.local.set({[key]:newState});
+        element.setAttribute('data-state',newState);
       });
-      break;
-      case 'hearts':
-      chrome.storage.sync.get(['heartsKey']).then((r)=>{
-        if(r.heartsKey === 'on'){
-          chrome.storage.sync.set({heartsKey:'off'});
-          heartsEl.setAttribute('data-state','off');
-        }
-        else if(r.heartsKey === 'off'){
-          chrome.storage.sync.set({heartsKey:'on'});
-          heartsEl.setAttribute('data-state','on');
-        }
-      });
-      break;
-      case 'recomm':
-      chrome.storage.sync.get(['recommKey']).then((r)=>{
-        if(r.recommKey === 'on'){
-          chrome.storage.sync.set({recommKey:'off'});
-          recommEl.setAttribute('data-state','off');
-        }
-        else if(r.recommKey === 'off'){
-          chrome.storage.sync.set({recommKey:'on'});
-          recommEl.setAttribute('data-state','on');
-        };
-      });
-      break;
-      case 'reload':
-        chrome.tabs.reload();
-      break;
     };
 
-  })
+    switch (button.dataset.vklive){
+      case 'points':
+        toggleSetting('vklivePointsKey', vklivePoints);
+        break;
+      case 'hearts':
+        toggleSetting('vkliveHeartsKey', vkliveHearts);
+        break;
+      case 'recommendations':
+        toggleSetting('vkliveRecommendationsKey', vkliveRecommendations);
+        break;
+      case 'portal':
+        toggleSetting('vklivePortalKey', vklivePortal);
+        break;
+      case 'unfixed':
+        toggleSetting('vkliveUnfixedKey', vkliveUnfixed);
+        break;
+    };
+
+  });
 });
+
+document.getElementById('reload').addEventListener('click',()=>chrome.tabs.reload());
