@@ -4,7 +4,8 @@
   box-sizing:border-box!important;
   outline:none!important;}
 
-html,body{
+html,
+body{
   user-select:none;
   position:relative;
   margin:0;
@@ -24,22 +25,20 @@ body{
   border:0;
   white-space:nowrap;
   width:100%;
-  padding:10px 20px 10px 35px;
+  padding:8px 20px 8px 35px;
   cursor:pointer;
   transition:background-color 0.2s,color 0.2s;}
 
 #reload.button{
-  text-align:center;
+  justify-content:center;
   padding:10px 20px;}
-
-#reload.button .text{width:100%;}
 
 @media (hover: hover){
 .button:hover{
   color:rgb(255,255,255);
   background-color:rgb(65,65,65);}}
 
-.button .status::after{
+.button::after{
   position:absolute;
   display:block;
   content:'';
@@ -50,11 +49,11 @@ body{
   left:15px;
   transform:translateY(-50%);}
 
-.button[data-state='on'] .status::after{
+.button[data-state='on']::after{
   background-color:rgb(41,165,57);
   box-shadow:0 0 5px 1px rgb(41,165,57);}
 
-.button[data-state='off'] .status::after{
+.button[data-state='off']::after{
   background-color:rgb(205,53,68);
   box-shadow:0 0 5px 1px rgb(205,53,68);}
 
@@ -64,3 +63,9 @@ body{
   width:100%;
   padding:8px 8px 10px;
   font-size:80%;}
+
+.title{
+  padding:5px 20px;
+  background-color:rgb(25,25,25);
+  color:rgb(230,230,230);
+  font-size:16px;}
