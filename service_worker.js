@@ -1,11 +1,8 @@
-
-const vkliveSite = new RegExp(/^(https:\/\/)live\.vkvideo\.ru/);
 const vkliveStream = new RegExp(/^(https:\/\/)live\.vkvideo\.ru\/([-a-zA-Z0-9%_&.]*?)$/);
 
 const vkliveKeys = [
   {key:'vklivePointsKey',value:'on'},
-  {key:'vkliveHeartsKey',value:'on'},
-  {key:'vkliveUnfixedKey',value:'off'}
+  {key:'vkliveHeartsKey',value:'on'}
 ];
 
 Promise.all(vkliveKeys.map(({key,value}) =>
@@ -15,13 +12,6 @@ Promise.all(vkliveKeys.map(({key,value}) =>
 ));
 
 function vkliveFunc(dUrl,dTab){
-  if(vkliveSite.test(dUrl) === true){
-    chrome.scripting.executeScript({
-      target: {tabId: dTab},
-      func: vkliveSiteHelper
-    });
-  };
-
   if(vkliveStream.test(dUrl) === true){
     chrome.scripting.executeScript({
       target: {tabId: dTab},
@@ -42,23 +32,6 @@ chrome.webNavigation.onCommitted.addListener(details=>{
     vkliveFunc(details.url,details.tabId);
   };
 },filter);
-
-function vkliveSiteHelper(){
-
-  // нефиксированная ширина
-  let app = document.querySelector('[class*="App_appChannelPage"]');
-  async function appStyle(){
-    try{
-      let r = await chrome.storage.local.get(['vkliveUnfixedKey']);
-      if(r.vkliveUnfixedKey === 'on'){
-        app.style.setProperty('min-width', '100%', 'important');
-      }
-    }
-    catch(error){console.error(error)}
-  };
-  if(app && !app.style.minWidth) appStyle();
-
-};
 
 function vkliveStreamHelper(){
   // баллы
