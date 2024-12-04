@@ -47,44 +47,55 @@ chrome.webNavigation.onCommitted.addListener(details=>{
 
 function vkliveSiteHelper(){
 
-  chrome.storage.local.get(['vkliveUnfixedKey']).then((r)=>{
-    if(r.vkliveUnfixedKey === 'on'){
-      let appWidth = document.querySelector('[class*="App_appChannelPage"]');
-      if(appWidth) appWidth.style.setProperty('min-width','100%','important');
-    };
-  });
+  // нефиксированная ширина
+  let app = document.querySelector('[class*="App_appChannelPage"]');
+  async function appStyle(){
+    try{
+      let r = await chrome.storage.local.get(['vkliveUnfixedKey']);
+      if(r.vkliveUnfixedKey === 'on'){
+        app.style.setProperty('min-width', '100%', 'important');
+      }
+    }
+    catch(error){console.error(error)}
+  };
+  if(app && !app.style.minWidth) appStyle();
+
+  // скрыть рекомендации
+  let recommendations = document.querySelector('[class*="ChannelsRecommendations_root"]');
+  async function recommendationsStyle(){
+    try{
+      let r = await chrome.storage.local.get(['vkliveRecommendationsKey']);
+      if(r.vkliveRecommendationsKey === 'on'){
+        recommendations.style.setProperty('display','none','important');
+        let delimiter = document.querySelector('[class*="Channels_delimiter"]');
+        if(delimiter) delimiter.style.setProperty('display','none','important');
+      }
+    }
+    catch(error){console.error(error)}
+  };
+  if(recommendations && !recommendations.style.display) recommendationsStyle();
+
+  // скрыть портал
+  let portal = document.querySelector('[class*="ChannelsPortalButton_root"]');
+  async function portalStyle(){
+    try{
+      let r = await chrome.storage.local.get(['vklivePortalKey']);
+      if(r.vklivePortalKey === 'on'){
+        document.querySelector('[class*="ChannelsPortalButton_root"]').style.setProperty('display','none','important');
+      }
+    }
+    catch(error){console.error(error)}
+  };
+  if(portal && !portal.style.display) portalStyle();
 
   let channelsRoot = document.querySelector('[class*="Channels_root"]');
-  if(channelsRoot){
-
-    let channelsPanel=()=>{
-      // рекомендации
-      chrome.storage.local.get(['vkliveRecommendationsKey']).then((r)=>{
-        if(r.vkliveRecommendationsKey === 'on'){
-          let channelsRecommendations = channelsRoot.querySelector('[class*="ChannelsRecommendations_root"]');
-          if(channelsRecommendations) channelsRecommendations.style.display = "none";
-          let channelsDelimiter = channelsRoot.querySelector('[class*="Channels_delimiter"]');
-          if(channelsDelimiter) channelsDelimiter.style.display = "none";
-        };
-      });
-
-      // кнопка портала
-      chrome.storage.local.get(['vklivePortalKey']).then((r)=>{
-        if(r.vklivePortalKey === 'on'){
-          let channelsPortalButton = channelsRoot.querySelector('[class*="ChannelsPortalButton_root"]');
-          if(channelsPortalButton) channelsPortalButton.style.display = "none";
-        };
-      });
-    };
-    channelsPanel();
-
-    let observerChannels = new MutationObserver((m) => {
-      m.forEach((mutation) => {
-        if(mutation.type === 'childList') channelsPanel();
-      });
+  let observerChannels = new MutationObserver((m) => {
+    m.forEach((mutation) => {
+      if(mutation.type === 'attributes') portalStyle();
     });
-    observerChannels.observe(channelsRoot,{subtree:true,childList:true});
-  };
+  });
+  observerChannels.observe(channelsRoot,{attributes:true});
+
 };
 
 function vkliveStreamHelper(){
@@ -98,7 +109,7 @@ function vkliveStreamHelper(){
         if(r.vklivePointsKey === 'on'){
           let pointsCollecting=()=>{
             let bonus = document.querySelector('[class*="PointActions_buttonBonus"]');
-            if(bonus)bonus.click();
+            if(bonus) bonus.click();
           };
           pointsCollecting();
 
