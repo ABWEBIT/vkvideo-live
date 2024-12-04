@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "VK Video Live помощник",
   "description": "Полезные изменения на live.vkvideo.ru",
-  "version": "1.6.5",
-  "permissions": ["webNavigation","tabs","scripting","storage"],
+  "version": "1.7.0",
+  "permissions": ["webNavigation","scripting","storage"],
   "action": {"default_popup": "settings.html"},
   "background": {"service_worker": "service_worker.js"},
   "host_permissions": ["*://live.vkvideo.ru/*"]
