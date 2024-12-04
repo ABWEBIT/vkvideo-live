@@ -6,5 +6,11 @@
   "permissions": ["webNavigation","scripting","storage"],
   "action": {"default_popup": "settings.html"},
   "background": {"service_worker": "service_worker.js"},
-  "host_permissions": ["https://live.vkvideo.ru/*"]
+  "host_permissions": ["https://live.vkvideo.ru/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://live.vkvideo.ru/*"],
+      "css": ["fix.css"]
+    }
+  ]
 }
