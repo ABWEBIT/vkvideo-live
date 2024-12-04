@@ -1,19 +1,15 @@
 'use strict';
-let vkliveButtons = document.querySelectorAll('.button[data-vklive]');
-
 let
+vkliveButtons = document.querySelectorAll('.button[data-vklive]'),
 vklivePoints = document.querySelector('[data-vklive="points"]'),
-vkliveHearts = document.querySelector('[data-vklive="hearts"]'),
-vkliveUnfixed = document.querySelector('[data-vklive="unfixed"]');
+vkliveHearts = document.querySelector('[data-vklive="hearts"]');
 
 chrome.storage.local.get([
   'vklivePointsKey',
-  'vkliveHeartsKey',
-  'vkliveUnfixedKey'
+  'vkliveHeartsKey'
 ]).then((r) => {
   vklivePoints.setAttribute('data-state', r.vklivePointsKey);
   vkliveHearts.setAttribute('data-state', r.vkliveHeartsKey);
-  vkliveUnfixed.setAttribute('data-state', r.vkliveUnfixedKey);
 });
 
 vkliveButtons.forEach(function(button){
@@ -28,15 +24,8 @@ vkliveButtons.forEach(function(button){
     };
 
     switch (button.dataset.vklive){
-      case 'points':
-        toggleSetting('vklivePointsKey', vklivePoints);
-        break;
-      case 'hearts':
-        toggleSetting('vkliveHeartsKey', vkliveHearts);
-        break;
-      case 'unfixed':
-        toggleSetting('vkliveUnfixedKey', vkliveUnfixed);
-        break;
+      case 'points':toggleSetting('vklivePointsKey',vklivePoints);break;
+      case 'hearts':toggleSetting('vkliveHeartsKey',vkliveHearts);break;
     };
 
   });
