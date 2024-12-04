@@ -3,11 +3,9 @@ const vkliveSite = new RegExp(/^(https:\/\/)live\.vkvideo\.ru/);
 const vkliveStream = new RegExp(/^(https:\/\/)live\.vkvideo\.ru\/([-a-zA-Z0-9%_&.]*?)$/);
 
 const vkliveKeys = [
-  { key: 'vklivePointsKey', value: 'on' },
-  { key: 'vkliveHeartsKey', value: 'on' },
-  { key: 'vkliveRecommendationsKey', value: 'off' },
-  { key: 'vklivePortalKey', value: 'off' },
-  { key: 'vkliveUnfixedKey', value: 'off' }
+  {key:'vklivePointsKey',value:'on'},
+  {key:'vkliveHeartsKey',value:'on'},
+  {key:'vkliveUnfixedKey',value:'off'}
 ];
 
 Promise.all(vkliveKeys.map(({key,value}) =>
@@ -59,42 +57,6 @@ function vkliveSiteHelper(){
     catch(error){console.error(error)}
   };
   if(app && !app.style.minWidth) appStyle();
-
-  // скрыть рекомендации
-  let recommendations = document.querySelector('[class*="ChannelsRecommendations_root"]');
-  async function recommendationsStyle(){
-    try{
-      let r = await chrome.storage.local.get(['vkliveRecommendationsKey']);
-      if(r.vkliveRecommendationsKey === 'on'){
-        recommendations.style.setProperty('display','none','important');
-        let delimiter = document.querySelector('[class*="Channels_delimiter"]');
-        if(delimiter) delimiter.style.setProperty('display','none','important');
-      }
-    }
-    catch(error){console.error(error)}
-  };
-  if(recommendations && !recommendations.style.display) recommendationsStyle();
-
-  // скрыть портал
-  let portal = document.querySelector('[class*="ChannelsPortalButton_root"]');
-  async function portalStyle(){
-    try{
-      let r = await chrome.storage.local.get(['vklivePortalKey']);
-      if(r.vklivePortalKey === 'on'){
-        document.querySelector('[class*="ChannelsPortalButton_root"]').style.setProperty('display','none','important');
-      }
-    }
-    catch(error){console.error(error)}
-  };
-  if(portal && !portal.style.display) portalStyle();
-
-  let channelsRoot = document.querySelector('[class*="Channels_root"]');
-  let observerChannels = new MutationObserver((m) => {
-    m.forEach((mutation) => {
-      if(mutation.type === 'attributes') portalStyle();
-    });
-  });
-  observerChannels.observe(channelsRoot,{attributes:true});
 
 };
 
