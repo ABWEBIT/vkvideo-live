@@ -1,4 +1,5 @@
 *,*:after,*:before{transition:none!important;}
+
 [class*="App_appChannelPage"]{min-width:100%!important;}
 [class*="OptimizedChannelsItem_name"]{line-height:18px!important;}
 
@@ -8,3 +9,4 @@
   min-width:48px!important;}
 
 [class*="CollapsibleLink_icon"]{min-width:28px!important;}
+[class*="OptimizedChannelsItem_container"]{min-width:28px!important;}
