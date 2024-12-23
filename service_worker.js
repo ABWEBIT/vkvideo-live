@@ -1,16 +1,10 @@
-const vkliveStream = new RegExp(/^(https:\/\/)live\.vkvideo\.ru\/([-a-zA-Z0-9%_&.]*?)$/);
-
 const vkliveKeys = [
   {key:'vklivePointsKey',value:'on'},
   {key:'vkliveHeartsKey',value:'on'}
 ];
+Promise.all(vkliveKeys.map(({key,value}) => chrome.storage.local.set({[key]:value})));
 
-Promise.all(vkliveKeys.map(({key,value}) =>
-  chrome.storage.local.get([key]).then((r) => {
-    if(r[key] == null) chrome.storage.local.set({[key]:value});
-  })
-));
-
+const vkliveStream = new RegExp(/^(https:\/\/)live\.vkvideo\.ru\/([-a-zA-Z0-9%_&.]*?)$/);
 function vkliveFunc(dUrl,dTab){
   if(vkliveStream.test(dUrl) === true){
     chrome.scripting.executeScript({
@@ -43,7 +37,7 @@ function vkliveStreamHelper(){
       chrome.storage.local.get(['vklivePointsKey']).then((r)=>{
         if(r.vklivePointsKey === 'on'){
           let pointsCollecting=()=>{
-            let bonus = document.querySelector('[class*="PointActions_buttonBonus"]');
+            let bonus = pointsButton.querySelector('[class*="PointActions_buttonBonus"]');
             if(bonus) bonus.click();
           };
           pointsCollecting();
